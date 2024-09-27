@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= test.name %></title>
+    <script>
+      // JavaScript to handle auto-submission after the time limit
+      window.onload = function() {
+          let timerElement = document.getElementById('timer');
+          let timeLeft = 60;
+
+          function countdown() {
+              if (timeLeft <= 0) {
+                  document.getElementById('testForm').submit();
+              } else {
+                  timerElement.innerHTML = `Time Left: ${timeLeft} seconds`;
+                  timeLeft -= 1;
+              }
+          }
+
+          setInterval(countdown, 1000);
+
+          setTimeout(function() {
+              document.getElementById('testForm').submit();
+          }, timeLeft * 1000);
+      }
+    </script>
+  </head>
+  <body>
+    <h1><%= test.name %></h1>
+    <p><%= test.description %></p>
+    <p id="timer">Time Left: <%= test.timeLimit %> seconds</p>
+
+    <form id="testForm" action="/submit-test" method="POST">
+      <!-- Hidden inputs for student/test metadata -->
+      <input type="hidden" name="studentId" value="<%= studentId %>" />
+      <input type="hidden" name="testId" value="<%= testId %>" />
+
+      <!-- Loop through the questions dynamically -->
+      <% test.questions.forEach(function(question, index) { %>
+      <div>
+        <label for="question<%= index + 1 %>"
+          ><%= index + 1 %>. <%= question.question %></label
+        >
+        <input
+          type="number"
+          id="question<%= index + 1 %>"
+          name="answers[<%= index + 1 %>]"
+          required
+        />
+      </div>
+      <% }); %>
+
+      <!-- Submit button in case they finish early -->
+      <button type="submit">Submit</button>
+    </form>
+  </body>
+</html>
